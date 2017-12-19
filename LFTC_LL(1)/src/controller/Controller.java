@@ -25,7 +25,7 @@ public class Controller {
 
 	
 	
-	public Controllerasd(){
+	public Controller(){
 		
 	}
 	
