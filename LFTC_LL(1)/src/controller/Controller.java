@@ -11,9 +11,9 @@ import repo.Repository;
 
 public class Controller {
 	private Repository repo  = new Repository();
-	
 	List<String> firstList = new ArrayList<String>();
-	LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
+	List<String> followList = new ArrayList<String>();
+	
 	
 	public Repository getRepo() {
 		return repo;
@@ -31,6 +31,9 @@ public class Controller {
 	
 	//String= X Nonterminal, List<String> First(X)
 	public LinkedHashMap<String,List<String>> first(String nonterminal,Grammar grammar){
+		firstList.clear();
+		LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
+		
 		List<Production> productionList = grammar.getProductii();
 		List<String> terminalList = grammar.getTerminali();
 		for(int i=0; i<productionList.size(); i++){
@@ -56,67 +59,44 @@ public class Controller {
 		return map;
 	}
 	
+	public LinkedHashMap<String,List<String>> follow(String nonterminal, Grammar grammar){
+		followList.clear();
+		LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
+		List<Production> productionList = grammar.getProductii();
+		List<String> terminalList = grammar.getTerminali();
+		if(nonterminal.equals(grammar.getSimbolStart())) {
+			followList.add("$");
+		}
+		for(int i=0; i<productionList.size(); i++) {
+			
+			for(int j=0; j<productionList.get(i).getPdp().size(); j++) {
+				if(productionList.get(i).getPdp().get(j).contains(nonterminal)) {
+					//&& String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)).equals("")
+					int indexOfNonterminal = productionList.get(i).getPdp().get(j).indexOf(nonterminal);
+					if(indexOfNonterminal+1 > productionList.get(i).getPdp().get(j).length() && productionList.get(i).getPdp().get(j).contains(nonterminal) ){
+						follow(productionList.get(i).getPsp(),grammar);
+					}
+					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && productionList.get(i).getPdp().get(j).contains(nonterminal) && terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
+						followList.add(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
+					}
+					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() &&productionList.get(i).getPdp().get(j).contains(nonterminal) && !terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
+						List<String> firsts = first(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)),grammar).get(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
+						for(String first: firsts) {
+							if(!first.equals("0")) {
+								followList.add(first);
+							}
+						}
+						follow(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)),grammar);
+					}
+				}
+				
+			}
+		}
+		map.put(nonterminal,followList);
+		return map;
+	}
 	
 	
-//	public Map<Integer,Production> numProductions(Grammar gr){
-//		Map<Integer,Production> mapProductions  = new HashMap<Integer,Production>();
-//		Integer productionNumber=1;
-//		for(Production prod: gr.getProductii()){
-//			mapProductions.put(productionNumber, prod);
-//			productionNumber++;
-//		}
-//		
-//		return mapProductions;
-//		
-//	}
-	
-	
-//	public List<ValueFirstFollow> tableFirstFollow(Production production,Map<Integer,Production> mapProductions) throws IOException{
-//		Grammar gr = repo.citireGramFisier();
-//		List<ValueFirstFollow> valueFirstList = new ArrayList<ValueFirstFollow>();
-//		List<String> terminalList = gr.getTerminali();
-//		List<String> nonterminalList = gr.getNeterminali();
-//		List<String> firstList = new ArrayList<>();
-//		List<Production> productionList = gr.getProductii();
-//		List<String> startSymbolList = new ArrayList<String>();
-//		for(int i=0; i<mapProductions.size(); i++){
-//			String startSymbol = mapProductions.get(i).getPsp(); //"S"->BA
-//			startSymbolList.add(startSymbol);
-//			if(nonterminalList.contains(mapProductions.get(i).getPdp().get(0))){//is nonterminal
-//				
-//				productionList = findProductionBySymbol(mapProductions.get(i).getPdp().get(0),mapProductions);
-//				for(Production prod :productionList){
-//					tableFirstFollow(prod,mapProductions);
-//				}
-//			
-//			}
-//			else{
-//				
-//				String first = mapProductions.get(i).getPdp().get(0);
-//				firstList.add(first);
-//			}
-//				ValueFirstFollow valueFirst = new ValueFirstFollow(startSymbolList.get(0),firstList,null);
-//				startSymbolList.clear();
-//				valueFirstList.add(valueFirst);
-//			}
-//			
-//		
-//		
-//		
-//		return null;
-//		
-//	}
-//	public List<Production> findProductionBySymbol(String symbol,Map<Integer,Production> map){
-//		List<Production> productionList = new ArrayList<Production>();
-//		for(int i=0; i<map.size(); i++){
-//			if(map.get(i).getPsp().equals(symbol)){
-//				productionList.add(map.get(i));
-//			}
-//		}
-//		
-//		
-//		return productionList;
-//	}
 
 
 }

@@ -21,7 +21,7 @@ public class Repository {
 		
 	}
 	public Grammar citireGramFisier() throws IOException{
-		Reader reader = new FileReader("D:\\LFTC\\Lab2\\Gramatica.txt");
+		Reader reader = new FileReader("Gramatica.txt");
 		BufferedReader br = new BufferedReader(reader);
 		List<String> lines = br.lines().collect(Collectors.toList());
 		String start = lines.get(0).split(" ")[0];

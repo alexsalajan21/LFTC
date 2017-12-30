@@ -1,0 +1,8 @@
+E TX
+X +TX
+X 0
+T FY
+Y *FY
+Y 0
+F (E)
+F i
