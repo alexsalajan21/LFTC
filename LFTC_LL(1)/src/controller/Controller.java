@@ -73,20 +73,20 @@ public class Controller {
 				if(productionList.get(i).getPdp().get(j).contains(nonterminal)) {
 					//&& String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)).equals("")
 					int indexOfNonterminal = productionList.get(i).getPdp().get(j).indexOf(nonterminal);
-					if(indexOfNonterminal+1 > productionList.get(i).getPdp().get(j).length() && productionList.get(i).getPdp().get(j).contains(nonterminal) ){
-						follow(productionList.get(i).getPsp(),grammar);
+					if(indexOfNonterminal+1 == productionList.get(i).getPdp().get(j).length() && !productionList.get(i).getPsp().equals(nonterminal) ){
+						followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
 					}
-					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && productionList.get(i).getPdp().get(j).contains(nonterminal) && terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
+					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
 						followList.add(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
 					}
-					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() &&productionList.get(i).getPdp().get(j).contains(nonterminal) && !terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
+					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && !terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
+						followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
 						List<String> firsts = first(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)),grammar).get(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
 						for(String first: firsts) {
 							if(!first.equals("0")) {
 								followList.add(first);
 							}
 						}
-						follow(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)),grammar);
 					}
 				}
 				
