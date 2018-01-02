@@ -5,6 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ArrayTable;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
+
+import model.CellValue;
 import model.Grammar;
 import model.Production;
 import repo.Repository;
@@ -95,6 +101,62 @@ public class Controller {
 		map.put(nonterminal,followList);
 		return map;
 	}
+	
+	public Map<Production,Integer> numberRuleAppliedToProduction(Grammar grammar){
+		List<Production> productionList = grammar.getProductii();
+		LinkedHashMap<Production,Integer> map = new LinkedHashMap<Production,Integer>();
+		int  number = 1;
+		for(Production prod: productionList) {
+			map.put(prod, number);
+			number++;
+		}
+		return map;
+		
+	}
+	public Table<String,String,CellValue> createTable(Grammar grammar) {
+		List<String> columnTable =grammar.getTerminali();
+		columnTable.add("$");
+		List<String> rowTable = grammar.getNeterminali();
+		for(String terminal: columnTable) {
+			rowTable.add(terminal);
+		}
+		Table<String,String,CellValue> table = ArrayTable.create(rowTable,columnTable);
+		
+		Map<String,Integer> valueMap = new LinkedHashMap<String,Integer>();
+		Map<Production,Integer> mapRuleNumber = numberRuleAppliedToProduction(grammar);
+		List<Production> productionList = grammar.getProductii();
+		for(Production  production: productionList) {
+			List<String> firstList = first(production.getPsp(),grammar).get(production.getPsp());
+			List<String> followList = follow(production.getPsp(),grammar).get(production.getPsp());
+			for(String atom:firstList) {
+				
+				valueMap.put(production.getPdp().get(0), mapRuleNumber.get(production));
+				if(atom.charAt(0)!= '0') {
+					CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
+					
+					table.put(production.getPsp(),atom, value);
+					
+					
+				}
+				else if(atom.charAt(0) == '0') {
+					
+					for(String follow:followList) {
+						CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
+						table.put(production.getPsp(),follow, value);
+					}
+					
+				}
+				
+			}
+			
+			
+		}
+		return table;
+		
+		
+	}
+
+	
 	
 	
 

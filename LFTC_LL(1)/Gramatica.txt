@@ -1,8 +1,8 @@
-E TX
-X +TX
-X 0
-T FY
-Y *FY
-Y 0
-F (E)
-F i
+S BA
+A +BA
+A 0
+B DC
+C *DC
+C 0
+D (S)
+D a
