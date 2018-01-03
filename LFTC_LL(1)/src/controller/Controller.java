@@ -48,7 +48,7 @@ public class Controller {
 						firstList.add(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)));
 					}
 					else if(!terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0))) && !productionList.get(i).getPdp().get(0).equals("0")){
-						first(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)),grammar);
+						firstList = first(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)),grammar).get(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)));
 					}
 					else if(productionList.get(i).getPdp().get(0).equals("0")){
 						firstList.add("0"); // stands for epsilon
@@ -114,9 +114,19 @@ public class Controller {
 		
 	}
 	public Table<String,String,CellValue> createTable(Grammar grammar) {
-		List<String> columnTable =grammar.getTerminali();
+		List<String> nonterminalList = grammar.getNeterminali();
+		List<String> terminalList = grammar.getTerminali();
+	
+		List<String> columnTable = new ArrayList<String>();
+		for(String terminal: terminalList) {
+			columnTable.add(terminal);
+		}
 		columnTable.add("$");
-		List<String> rowTable = grammar.getNeterminali();
+		
+		List<String> rowTable = new ArrayList<String>();
+		for(String nonterminal: nonterminalList) {
+			rowTable.add(nonterminal);
+		}
 		for(String terminal: columnTable) {
 			rowTable.add(terminal);
 		}
@@ -126,31 +136,53 @@ public class Controller {
 		Map<Production,Integer> mapRuleNumber = numberRuleAppliedToProduction(grammar);
 		List<Production> productionList = grammar.getProductii();
 		for(Production  production: productionList) {
+			firstList.clear();
+			followList.clear();
 			List<String> firstList = first(production.getPsp(),grammar).get(production.getPsp());
-			List<String> followList = follow(production.getPsp(),grammar).get(production.getPsp());
+			
 			for(String atom:firstList) {
-				
-				valueMap.put(production.getPdp().get(0), mapRuleNumber.get(production));
-				if(atom.charAt(0)!= '0') {
+				//valueMap.put(production.getPdp().get(0), mapRuleNumber.get(production));
+				if(atom.charAt(0)!= '0' && production.getPdp().get(0).charAt(0) != '0' ) {
 					CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
+					if(atom.equals(String.valueOf(production.getPdp().get(0).charAt(0))) || nonterminalList.contains(String.valueOf(production.getPdp().get(0).charAt(0)))) {
+						table.put(production.getPsp(),atom, value);
+					}
 					
-					table.put(production.getPsp(),atom, value);
 					
 					
 				}
-				else if(atom.charAt(0) == '0') {
-					
+				else if(atom.charAt(0) == '0' && production.getPdp().get(0).charAt(0) == '0') {
+					List<String> followList = follow(production.getPsp(),grammar).get(production.getPsp());
 					for(String follow:followList) {
 						CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
 						table.put(production.getPsp(),follow, value);
 					}
 					
 				}
+			
 				
 			}
 			
 			
 		}
+		for(String row: rowTable) {
+			for(String column: columnTable) {
+				if(row.equals(column)) {
+					if(!row.equals("$")) {
+						CellValue value = new CellValue("pop",0); 
+						table.put(row, column,value);
+					}
+					else {
+						CellValue val = new CellValue("acc",0);
+						table.put(row, column,val);
+					}
+					
+				}
+				
+			}
+		}
+		
+		
 		return table;
 		
 		
