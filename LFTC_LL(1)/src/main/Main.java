@@ -56,22 +56,15 @@ public class Main {
 		
 		System.out.println("\nTable\n");
 		Table<String, String, CellValue> table = ctrl.createTable(grammar);
-	/*	Set<String> rowSet = table.rowKeySet();
-		Set<String> columnSet = table.columnKeySet();*/
-	/*	for(String column: columnSet) {
-			System.out.print(" "+column+" ");
-		}
-		System.out.println();
-		for(String row: rowSet) {
-			System.out.println(row+ " ");
-			
-		}*/
+	
 		
 		for(Cell<String, String, CellValue> entry: table.cellSet() ) {
 			
 			System.out.println( entry.getRowKey() + " "+ entry.getColumnKey()+" "+ entry.getValue() );
 		}
-		
+		System.out.println("\nSintactic Analizor LL(1)\n");
+		String sequence = "(a+a)*a";
+		ctrl.analSintLL1(table, mapRuleNumber, sequence);
 		
 	}
 }

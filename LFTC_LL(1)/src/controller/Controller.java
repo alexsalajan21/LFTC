@@ -44,7 +44,7 @@ public class Controller {
 		List<String> terminalList = grammar.getTerminali();
 		for(int i=0; i<productionList.size(); i++){
 			if(productionList.get(i).getPsp().equals(nonterminal)){
-					if(terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)))){
+					if(terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0))) && !firstList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)))){
 						firstList.add(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)));
 					}
 					else if(!terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0))) && !productionList.get(i).getPdp().get(0).equals("0")){
@@ -144,10 +144,14 @@ public class Controller {
 				//valueMap.put(production.getPdp().get(0), mapRuleNumber.get(production));
 				if(atom.charAt(0)!= '0' && production.getPdp().get(0).charAt(0) != '0' ) {
 					CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
-					if(atom.equals(String.valueOf(production.getPdp().get(0).charAt(0))) || nonterminalList.contains(String.valueOf(production.getPdp().get(0).charAt(0)))) {
+					//if( table.get(production.getPsp(),atom) == null && (terminalList.contains(String.valueOf(production.getPdp().get(0).charAt(0))) || nonterminalList.contains(String.valueOf(production.getPdp().get(0).charAt(0))))) {
+					if( table.get(production.getPsp(),atom) == null && (atom.equals(String.valueOf(production.getPdp().get(0).charAt(0))) || nonterminalList.contains(String.valueOf(production.getPdp().get(0).charAt(0))))) {
 						table.put(production.getPsp(),atom, value);
 					}
-					
+					else if(table.get(production.getPsp(), atom) != null && atom.equals(String.valueOf(production.getPdp().get(0).charAt(0))) ){
+						System.out.println("Error!");
+						System.exit(0);
+					}
 					
 					
 				}
@@ -155,7 +159,15 @@ public class Controller {
 					List<String> followList = follow(production.getPsp(),grammar).get(production.getPsp());
 					for(String follow:followList) {
 						CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
-						table.put(production.getPsp(),follow, value);
+						if(table.get(production.getPsp(),follow) == null) {
+							table.put(production.getPsp(),follow, value);
+						}
+						else {
+							System.out.println("The grammar is not of type LL(1).");
+							System.exit(0);
+							
+						}
+						
 					}
 					
 				}
@@ -178,7 +190,11 @@ public class Controller {
 					}
 					
 				}
-				
+				else if(!row.equals(column) && table.get(row, column)== null) {
+					CellValue val = new CellValue("err",0);
+					table.put(row, column, val);
+				}
+					
 			}
 		}
 		
@@ -188,9 +204,54 @@ public class Controller {
 		
 	}
 
+	public void analSintLL1(Table<String,String,CellValue> table, Map<Production,Integer> ruleNumbers, String sequence) {
+		String alpha = sequence + "$"; //column
+		String beta = "S$";   //row
+		String pi = "0";
+		boolean go = true;
+		String flag = " ";
+		while(go) {
+			CellValue value = table.get(String.valueOf(beta.charAt(0)), String.valueOf(alpha.charAt(0)));
+			if(value.getPdp() !="err" && value.getPdp()!="acc" && value.getPdp()!="pop") {
+				beta = removeCharAt(beta,0);
+				StringBuilder sBuilder = new StringBuilder(beta);
+				if(!value.getPdp().equals("0"))
+					beta=String.valueOf(sBuilder.insert(0,value.getPdp()));
+				pi = pi + String.valueOf(value.getRuleNumber());
+				
+			}
+			else {
+				if(value.getPdp() == "pop") {
+					beta = removeCharAt(beta,0);
+					alpha = removeCharAt(alpha,0);
+				}
+				else {
+					if(value.getPdp() == "acc") {
+						go = false;
+						flag = "acc";
+					}
+					else {
+						go = false;
+						flag = "err";
+					}
+				}
+			}
+		}
+		if( flag == "acc") {
+			System.out.println("Sequence accepted!");
+			System.out.println(pi);
+		}
+		else {
+			System.out.println("Sequence not accepted!");
+			
+		}
+	}
 	
-	
-	
+	public static String removeCharAt(String s, int pos) {
+		   StringBuffer buf = new StringBuffer( s.length() - 1 );
+		   buf.append( s.substring(0,pos) ).append( s.substring(pos+1) );
+		   return buf.toString();
+		}
 
 
 }
