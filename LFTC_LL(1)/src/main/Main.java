@@ -64,7 +64,14 @@ public class Main {
 		}
 		System.out.println("\nSintactic Analizor LL(1)\n");
 		String sequence = "(a+a)*a";
-		ctrl.analSintLL1(table, mapRuleNumber, sequence);
+		String pi = ctrl.analSintLL1(table,mapRuleNumber,sequence);
+		System.out.println(pi);
 		
+		System.out.println("\nParsing Tree:\n");
+		String startSymbol = grammar.getSimbolStart();
+		List<String> parsingListTree = ctrl.parsingTree(pi, mapRuleNumber,startSymbol);
+		for(String parse:parsingListTree) {
+			System.out.println(parse);
+		}
 	}
 }

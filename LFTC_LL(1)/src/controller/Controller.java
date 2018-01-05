@@ -149,7 +149,7 @@ public class Controller {
 						table.put(production.getPsp(),atom, value);
 					}
 					else if(table.get(production.getPsp(), atom) != null && atom.equals(String.valueOf(production.getPdp().get(0).charAt(0))) ){
-						System.out.println("Error!");
+						System.out.println("The Grammar is not of type LL(1)!");
 						System.exit(0);
 					}
 					
@@ -204,7 +204,7 @@ public class Controller {
 		
 	}
 
-	public void analSintLL1(Table<String,String,CellValue> table, Map<Production,Integer> ruleNumbers, String sequence) {
+	public String analSintLL1(Table<String,String,CellValue> table, Map<Production,Integer> ruleNumbers, String sequence) {
 		String alpha = sequence + "$"; //column
 		String beta = "S$";   //row
 		String pi = "0";
@@ -238,20 +238,47 @@ public class Controller {
 			}
 		}
 		if( flag == "acc") {
-			System.out.println("Sequence accepted!");
-			System.out.println(pi);
-		}
-		else {
-			System.out.println("Sequence not accepted!");
+			System.out.println("Sequence " + sequence +" accepted!");
 			
 		}
+		else {
+			System.out.println("Sequence "+sequence+ " not accepted!");
+			
+		}
+		return pi;
 	}
 	
 	public static String removeCharAt(String s, int pos) {
+
 		   StringBuffer buf = new StringBuffer( s.length() - 1 );
 		   buf.append( s.substring(0,pos) ).append( s.substring(pos+1) );
 		   return buf.toString();
 		}
-
+	
+	public List<String> parsingTree(String pi, Map<Production,Integer> ruleNumbers,String startSymbol){
+		
+		String parsingTree = startSymbol;
+		List<String> parsingTreeList = new ArrayList<String>();
+		for(int i=1; i<pi.length(); i++) {
+			for(Map.Entry<Production,Integer> entry: ruleNumbers.entrySet()) {
+				if(String.valueOf(entry.getValue()).equals(String.valueOf(pi.charAt(i)))) {
+					if(!entry.getKey().getPdp().get(0).equals("0")) {
+						parsingTree = parsingTree.replaceFirst(entry.getKey().getPsp(), entry.getKey().getPdp().get(0));
+						parsingTreeList.add(parsingTree);
+						
+					}
+					else{
+						parsingTree = parsingTree.replaceFirst(entry.getKey().getPsp(), "");
+						parsingTreeList.add(parsingTree);
+					}
+				}
+				
+				
+				
+			}
+			
+		}
+		return parsingTreeList;
+	}
 
 }
