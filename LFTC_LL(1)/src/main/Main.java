@@ -18,7 +18,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		
 		Grammar grammar = ctrl.getRepo().citireGramFisier();
-		Map<String,List<String>> mapForFirst;
+			Map<String,List<String>> mapForFirst;
 		Map<String,List<String>> mapForFollow;
 		List<String> nonterminalList = grammar.getNeterminali();
 		Map<Production,Integer> mapRuleNumber;
@@ -65,13 +65,8 @@ public class Main {
 		System.out.println("\nSintactic Analizor LL(1)\n");
 		String sequence = "(a+a)*a";
 		String pi = ctrl.analSintLL1(table,mapRuleNumber,sequence);
-		System.out.println(pi);
 		
-		System.out.println("\nParsing Tree:\n");
-		String startSymbol = grammar.getSimbolStart();
-		List<String> parsingListTree = ctrl.parsingTree(pi, mapRuleNumber,startSymbol);
-		for(String parse:parsingListTree) {
-			System.out.println(parse);
-		}
+		
+		
 	}
 }

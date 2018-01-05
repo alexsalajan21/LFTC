@@ -1,5 +1,6 @@
 package controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,13 +81,14 @@ public class Controller {
 					//&& String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)).equals("")
 					int indexOfNonterminal = productionList.get(i).getPdp().get(j).indexOf(nonterminal);
 					if(indexOfNonterminal+1 == productionList.get(i).getPdp().get(j).length() && !productionList.get(i).getPsp().equals(nonterminal) ){
-						followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
+							followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
 					}
 					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
 						followList.add(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
 					}
 					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && !terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
-						followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
+						if(!String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal)).equals(productionList.get(i).getPsp()))
+							followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
 						List<String> firsts = first(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)),grammar).get(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
 						for(String first: firsts) {
 							if(!first.equals("0")) {
@@ -204,7 +206,8 @@ public class Controller {
 		
 	}
 
-	public String analSintLL1(Table<String,String,CellValue> table, Map<Production,Integer> ruleNumbers, String sequence) {
+	public String analSintLL1(Table<String,String,CellValue> table, Map<Production,Integer> ruleNumbers, String sequence) throws IOException {
+		Grammar grammar = this.getRepo().citireGramFisier();
 		String alpha = sequence + "$"; //column
 		String beta = "S$";   //row
 		String pi = "0";
@@ -239,7 +242,13 @@ public class Controller {
 		}
 		if( flag == "acc") {
 			System.out.println("Sequence " + sequence +" accepted!");
-			
+			System.out.println(pi);
+			System.out.println("\nParsing Tree:\n");
+			String startSymbol = grammar.getSimbolStart();
+			List<String> parsingListTree = parsingTree(pi, ruleNumbers,startSymbol);
+			for(String parse:parsingListTree) {
+				System.out.println(parse);
+			}
 		}
 		else {
 			System.out.println("Sequence "+sequence+ " not accepted!");
