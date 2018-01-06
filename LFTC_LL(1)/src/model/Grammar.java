@@ -8,6 +8,7 @@ public class Grammar {
 	private List<String> terminali;
 	private List<Production> productii;
 	
+	
 	public Grammar(){
 		
 	}

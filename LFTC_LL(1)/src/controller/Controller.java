@@ -20,8 +20,17 @@ public class Controller {
 	private Repository repo  = new Repository();
 	List<String> firstList = new ArrayList<String>();
 	List<String> followList = new ArrayList<String>();
+	List<String> helpList = new ArrayList<String>();
 	
 	
+	public List<String> getHelpList() {
+		return helpList;
+	}
+
+	public void setHelpList(List<String> helpList) {
+		this.helpList = helpList;
+	}
+
 	public Repository getRepo() {
 		return repo;
 	}
@@ -106,8 +115,7 @@ public class Controller {
 		return map;
 	}
 	public LinkedHashMap<String,List<String>> firstForMLGrammar(String nonterminal,Grammar grammar){
-		firstList.clear();
-		//List<String> helpList = new ArrayList<String>();
+		
 		LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
 		List<String> nonterminalList = grammar.getNeterminali();
 		List<Production> productionList = grammar.getProductii();
@@ -115,18 +123,18 @@ public class Controller {
 		for(int i=0; i<productionList.size(); i++){
 			if(productionList.get(i).getPsp().equals(nonterminal)){
 				String split = productionList.get(i).getPdp().get(0).split(" ")[0];
-					if(terminalList.contains(split) && !firstList.contains(split)){
-						firstList.add(split);
+					if(terminalList.contains(split) && !helpList.contains(split)){
+						helpList.add(split);
+
 					}
 					else if(nonterminalList.contains(split)){
-						firstList = firstForMLGrammar(split,grammar).get(split);
+						helpList = firstForMLGrammar(split,grammar).get(split);
 						
 					}
 					}
 				}
 					
-		map.put(nonterminal, firstList);
-		
+		map.put(nonterminal, helpList);
 		return map;
 	}
 	public Map<Production,Integer> numberRuleAppliedToProduction(Grammar grammar){

@@ -76,7 +76,7 @@ System.out.println("First for Minilanguage Grammar:\n");
 		Grammar grammarML = ctrl.getRepo().readMlGrammar();
 		List<String> nonterminalsForMLGrammar = grammarML.getNeterminali();
 		for(String nonterminal: nonterminalsForMLGrammar) {
-
+			ctrl.getHelpList().clear();
 			firstForMLGrammar = ctrl.firstForMLGrammar(nonterminal,grammarML);
 			
 			
