@@ -1,0 +1,93 @@
+A->B ; C .
+B->var D
+D->E
+D->E ; D
+E->F : G
+F->H
+F->H I
+F->H F
+F->H I F
+H->a
+H->b
+H->c
+H->d
+H->e
+H->f
+H->g
+H->h
+H->i
+H->j
+H->k
+H->l
+H->m
+H->n
+H->o
+H->p
+H->q
+H->r
+H->s
+H->t
+H->u
+H->v
+H->w
+H->x
+H->y
+H->z
+I->0
+I->1
+I->2
+I->3
+I->4
+I->5
+I->6
+I->7
+I->8
+I->9
+G->J
+G->K
+J->integer
+J->string
+K->array [ L .. L , L .. L ] of J
+L->I
+L->I L
+C->begin M end
+M->N
+M->N M
+N->O
+N->P
+N->Q
+N->R
+O->write ( F ) ;
+O->write ( U ) ;
+O->write ( L ) ;
+O->writeln ;
+O->readln ( W ) ;
+U->' H '
+U->' HV '
+V->H
+V->I
+T->+
+T->-
+T->*
+T->/
+T->div
+T->mod
+W->F
+W->F , W
+P->for F := L to F do begin
+Q->if X then begin N end else begin N end ;
+X->Y Z Y
+Y->F
+Y->true
+Y->false
+Y->L
+Y->U
+Y->Y T Y
+R->F := Y ;
+R->F [ F , F ] := Y ;
+Z->==
+Z-><
+Z->>
+Z-><=
+Z->>=
+Z-><>

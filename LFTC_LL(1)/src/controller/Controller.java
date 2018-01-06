@@ -66,6 +66,8 @@ public class Controller {
 		return map;
 	}
 	
+
+
 	public LinkedHashMap<String,List<String>> follow(String nonterminal, Grammar grammar){
 		followList.clear();
 		LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
@@ -103,7 +105,30 @@ public class Controller {
 		map.put(nonterminal,followList);
 		return map;
 	}
-	
+	public LinkedHashMap<String,List<String>> firstForMLGrammar(String nonterminal,Grammar grammar){
+		firstList.clear();
+		//List<String> helpList = new ArrayList<String>();
+		LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
+		List<String> nonterminalList = grammar.getNeterminali();
+		List<Production> productionList = grammar.getProductii();
+		List<String> terminalList = grammar.getTerminali();
+		for(int i=0; i<productionList.size(); i++){
+			if(productionList.get(i).getPsp().equals(nonterminal)){
+				String split = productionList.get(i).getPdp().get(0).split(" ")[0];
+					if(terminalList.contains(split) && !firstList.contains(split)){
+						firstList.add(split);
+					}
+					else if(nonterminalList.contains(split)){
+						firstList = firstForMLGrammar(split,grammar).get(split);
+						
+					}
+					}
+				}
+					
+		map.put(nonterminal, firstList);
+		
+		return map;
+	}
 	public Map<Production,Integer> numberRuleAppliedToProduction(Grammar grammar){
 		List<Production> productionList = grammar.getProductii();
 		LinkedHashMap<Production,Integer> map = new LinkedHashMap<Production,Integer>();

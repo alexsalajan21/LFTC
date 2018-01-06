@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -20,7 +22,6 @@ public class Repository {
 	public Repository(){
 		
 	}
-	
 	
 	public Grammar citireGramFisier() throws IOException{
 		Reader reader = new FileReader("Gramatica.txt");
@@ -77,29 +78,32 @@ public class Repository {
 		Reader reader = new FileReader("MiniLanguageGrammar.txt");
 		BufferedReader br = new BufferedReader(reader);
 		List<String> lines = br.lines().collect(Collectors.toList());
-		String start = lines.get(0).split(" ")[0];
+		String start = lines.get(0).split("->")[0];
 		List<Production> productionList = new ArrayList<Production>();
 		List<String> neterminali = new ArrayList<String>();
 		List<String> terminali = new ArrayList<String>();
 		terminali = readSpecialTerminalsFromFile();
 		for(String line:lines){
 			List<String> pdp = new ArrayList<String>();
-			String [] splits = line.split(" ");
+			String [] splits = line.split("->");
 			String psp = splits[0]; // partea stanga a productiei
 			if(!psp.equals("$") && !neterminali.contains(psp))
 				neterminali.add(psp);
-			String[] array = splits[1].split("|"); // partea dreapta a productiei
+			String[] array = splits[1].split("\\|"); // partea dreapta a productiei
 			for(String a:array){
 				if(!pdp.contains(a))
 					pdp.add(a);
 				
 				//"^" stands for begining of string  
 				//"?" stands for zero or one character
-				
-				String[] splits1 = a.split("[^a-z+\\(\\)*.;,:''\\..\\:=]?");  
-				for(String sp : splits1){
-					if(!terminali.contains(sp) && !sp.equals(""))
-						terminali.add(sp);
+				Matcher matcher;
+				//matcher = Pattern.compile("(?U)\\w+|[.,<\\(\\[\\..\\:=]+|'([^']+)'|([^;])|([^\\)])|([^\\]])").matcher(a);
+				matcher = Pattern.compile("(?U)\\w|[.,<>\\(\\[\\..\\:=]+|([^'])|([^;])|([^\\)])|([^\\]])").matcher(a);
+				while(matcher.find()) {
+					if(!terminali.contains(matcher.group() ) && !matcher.group().equals(" ") && !Character.isUpperCase(matcher.group().charAt(0))) {
+						terminali.add(matcher.group());
+					}
+					
 					
 				}
 				
@@ -121,7 +125,7 @@ public class Repository {
 }
 
 
-	private List<String> readSpecialTerminalsFromFile() throws FileNotFoundException {
+	public List<String> readSpecialTerminalsFromFile() throws FileNotFoundException {
 		List<String> specialTerminalList = new ArrayList<String>();
 	
 		Reader reader = new FileReader("SpecialTerminals.txt");

@@ -67,6 +67,27 @@ public class Main {
 		String pi = ctrl.analSintLL1(table,mapRuleNumber,sequence);
 		
 		
+		System.out.println("\nMinilanguage Grammar:\n");
+		Grammar gr = ctrl.getRepo().readMlGrammar();
+		System.out.println(gr.toString());
+		
+System.out.println("First for Minilanguage Grammar:\n");
+		Map<String,List<String>> firstForMLGrammar;
+		Grammar grammarML = ctrl.getRepo().readMlGrammar();
+		List<String> nonterminalsForMLGrammar = grammarML.getNeterminali();
+		for(String nonterminal: nonterminalsForMLGrammar) {
+
+			firstForMLGrammar = ctrl.firstForMLGrammar(nonterminal,grammarML);
+			
+			
+			for (Map.Entry<String,List<String>> entry : firstForMLGrammar.entrySet()) {
+				
+			    System.out.println(entry.getKey() + ", " + entry.getValue());
+			    
+			}
+			
+		}
+	
 		
 	}
 }
