@@ -21,8 +21,25 @@ public class Controller {
 	List<String> firstList = new ArrayList<String>();
 	List<String> followList = new ArrayList<String>();
 	List<String> helpList = new ArrayList<String>();
+	List<String> helpListForFollow = new ArrayList<String>();
 	
 	
+	public List<String> getHelpListForFollow() {
+		return helpListForFollow;
+	}
+
+	public void setHelpListForFollow(List<String> helpListForFollow) {
+		this.helpListForFollow = helpListForFollow;
+	}
+
+	public List<String> getFollowList() {
+		return followList;
+	}
+
+	public void setFollowList(List<String> followList) {
+		this.followList = followList;
+	}
+
 	public List<String> getHelpList() {
 		return helpList;
 	}
@@ -57,7 +74,7 @@ public class Controller {
 					if(terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0))) && !firstList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)))){
 						firstList.add(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)));
 					}
-					else if(!terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0))) && !productionList.get(i).getPdp().get(0).equals("0")){
+					else if(!terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0))) && !productionList.get(i).getPdp().get(0).equals("0") && !String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)).equals(productionList.get(i).getPsp())){
 						firstList = first(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)),grammar).get(String.valueOf(productionList.get(i).getPdp().get(0).charAt(0)));
 					}
 					else if(productionList.get(i).getPdp().get(0).equals("0")){
@@ -91,8 +108,10 @@ public class Controller {
 				if(productionList.get(i).getPdp().get(j).contains(nonterminal)) {
 					//&& String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)).equals("")
 					int indexOfNonterminal = productionList.get(i).getPdp().get(j).indexOf(nonterminal);
-					if(indexOfNonterminal+1 == productionList.get(i).getPdp().get(j).length() && !productionList.get(i).getPsp().equals(nonterminal) ){
+					if(indexOfNonterminal+1 == productionList.get(i).getPdp().get(j).length() &&!productionList.get(i).getPsp().equals(nonterminal)) {
 							followList = follow(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
+							
+							
 					}
 					else if(indexOfNonterminal+1 < productionList.get(i).getPdp().get(j).length() && terminalList.contains(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)))) {
 						followList.add(String.valueOf(productionList.get(i).getPdp().get(j).charAt(indexOfNonterminal+1)));
@@ -127,8 +146,9 @@ public class Controller {
 						helpList.add(split);
 
 					}
-					else if(nonterminalList.contains(split)){
+					else if(nonterminalList.contains(split) && !split.equals(productionList.get(i).getPsp())){
 						helpList = firstForMLGrammar(split,grammar).get(split);
+						
 						
 					}
 					}
@@ -137,6 +157,48 @@ public class Controller {
 		map.put(nonterminal, helpList);
 		return map;
 	}
+
+	public LinkedHashMap<String,List<String>> followForMLGrammar(String nonterminal, Grammar grammar){
+		//helpListForFollow.clear();
+		LinkedHashMap<String,List<String>> map = new LinkedHashMap<String,List<String>>();
+		List<Production> productionList = grammar.getProductii();
+		List<String> terminalList = grammar.getTerminali();
+		int indexOfNonterminal = 0;
+		if(nonterminal.equals(grammar.getSimbolStart())) {
+			helpListForFollow.add("$");
+		}
+		for(int i=0; i<productionList.size(); i++) {
+			
+				if(productionList.get(i).getPdp().get(0).contains(nonterminal)) {
+					String[] splits = productionList.get(i).getPdp().get(0).split(" ");
+					for(int j=0; j<splits.length; j++) {
+						if(splits[j].equals(nonterminal)) {
+							indexOfNonterminal = j;
+							if(indexOfNonterminal+1 == splits.length && !productionList.get(i).getPsp().equals(nonterminal)) {
+								helpListForFollow = followForMLGrammar(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
+							}
+							else if(indexOfNonterminal+1 < splits.length && terminalList.contains(splits[indexOfNonterminal+1]) && !helpListForFollow.contains(splits[indexOfNonterminal + 1])) {
+								helpListForFollow.add(splits[indexOfNonterminal+1]);
+							}
+							else if(indexOfNonterminal+1 < splits.length && !terminalList.contains(splits[indexOfNonterminal+1])) {
+								if(!splits[indexOfNonterminal].equals(productionList.get(i).getPsp()))
+									helpListForFollow = followForMLGrammar(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
+								List<String> firsts = firstForMLGrammar(splits[indexOfNonterminal+1],grammar).get(splits[indexOfNonterminal+1]);
+								for(String first: firsts) {
+									if(!helpListForFollow.contains(first)) {
+										helpListForFollow.add(first);
+									}
+								}
+							}
+						}
+					}
+				}
+		}
+		map.put(nonterminal,helpListForFollow);
+		return map;
+	}
+	
+	
 	public Map<Production,Integer> numberRuleAppliedToProduction(Grammar grammar){
 		List<Production> productionList = grammar.getProductii();
 		LinkedHashMap<Production,Integer> map = new LinkedHashMap<Production,Integer>();

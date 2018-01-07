@@ -40,6 +40,7 @@ public class Main {
 		}
 		System.out.println("\nFollow:\n");
 		for (String  nonterminal: nonterminalList) {
+			ctrl.getFollowList().clear();
 			mapForFollow = ctrl.follow(nonterminal, grammar);
 			
 			for(Map.Entry<String, List<String>> entry: mapForFollow.entrySet()) {
@@ -88,6 +89,18 @@ System.out.println("First for Minilanguage Grammar:\n");
 			
 		}
 	
+		System.out.println("\nFollow For Minilanguage Grammar:\n");
+		Map<String,List<String>> followForMLGrammar;
+		for(String nonterminal: nonterminalsForMLGrammar) {
+			ctrl.getHelpListForFollow().clear();
+			followForMLGrammar = ctrl.followForMLGrammar(nonterminal, grammarML);
+			
+			for(Map.Entry<String, List<String>> entry:followForMLGrammar.entrySet() ) {
+				System.out.println(entry.getKey()+ ","+entry.getValue());
+			}
+		}
+		
 		
 	}
+
 }

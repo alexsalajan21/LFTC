@@ -63,7 +63,7 @@ O->write ( L ) ;
 O->writeln ;
 O->readln ( W ) ;
 U->' H '
-U->' HV '
+U->' H V '
 V->H
 V->I
 T->+
