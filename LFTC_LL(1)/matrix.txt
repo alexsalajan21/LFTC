@@ -1,24 +1,9 @@
-var A:array[1..10,1..10]of integer;
-	i,j,n,m:integer;
-	tip:string;
-begin 
-write('Introduceti dimensiunea matricei');
-readln(n,m);
-for i:=1 to n do
-for j:=1 to m do
-if i<j then 
-begin 
-	A[i,j]:=i;
-	tip:='Linie';
-end
-else
+var nr1, nr2, result : integer;
 begin
-	A[i,j]:=j;
-	tip:='Coloana';
-end;
-for i:=1 to n do begin
-for j:=1 to m do
-write(A[i,j]);
+write('Introduceti cele 2 numere');
+readln(nr1,nr2);
+result:=nr1+nr2;
 writeln;
-end;
+write('suma numerelor este:');
+write(result);
 end.

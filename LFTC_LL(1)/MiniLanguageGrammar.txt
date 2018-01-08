@@ -1,12 +1,8 @@
 A->B ; C .
 B->var D
-D->E
-D->E ; D
+D->E 
 E->F : G
 F->H
-F->H I
-F->H F
-F->H I F
 H->a
 H->b
 H->c
@@ -43,27 +39,18 @@ I->6
 I->7
 I->8
 I->9
-G->J
-G->K
-J->integer
-J->string
-K->array [ L .. L , L .. L ] of J
-L->I
-L->I L
+G->integer
 C->begin M end
 M->N
 M->N M
 N->O
-N->P
-N->Q
 N->R
-O->write ( F ) ;
-O->write ( U ) ;
-O->write ( L ) ;
+O->write ( S );
+S->F
+S->U
 O->writeln ;
 O->readln ( W ) ;
-U->' H '
-U->' H V '
+U->' H U '
 V->H
 V->I
 T->+
@@ -74,17 +61,11 @@ T->div
 T->mod
 W->F
 W->F , W
-P->for F := L to F do begin
-Q->if X then begin N end else begin N end ;
-X->Y Z Y
 Y->F
-Y->true
-Y->false
 Y->L
 Y->U
 Y->Y T Y
 R->F := Y ;
-R->F [ F , F ] := Y ;
 Z->==
 Z-><
 Z->>

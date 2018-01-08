@@ -92,6 +92,7 @@ System.out.println("First for Minilanguage Grammar:\n");
 		System.out.println("\nFollow For Minilanguage Grammar:\n");
 		Map<String,List<String>> followForMLGrammar;
 		for(String nonterminal: nonterminalsForMLGrammar) {
+			ctrl.getHelpList().clear();
 			ctrl.getHelpListForFollow().clear();
 			followForMLGrammar = ctrl.followForMLGrammar(nonterminal, grammarML);
 			
@@ -99,8 +100,30 @@ System.out.println("First for Minilanguage Grammar:\n");
 				System.out.println(entry.getKey()+ ","+entry.getValue());
 			}
 		}
+		System.out.println("\nNumbered Productions Minilanguage Grammar: \n");
+		Map<Production,Integer> numberedProductionML = ctrl.numberRuleAppliedToProduction(grammarML);
+		for(Map.Entry<Production, Integer> entry: numberedProductionML.entrySet()) {
+			System.out.println(entry.getKey()+ ","+entry.getValue());
+		}
+		System.out.println("\nTable Minilanguage Grammar:\n");
+		Table<String,String,CellValue> tableMLGrammar = ctrl.createTableForMLGrammar(grammarML);
+		for(Cell<String, String, CellValue> entry: tableMLGrammar.cellSet() ) {
+			if(!entry.getValue().getPdp().equals("err"))
+				System.out.println( entry.getRowKey() + " "+ entry.getColumnKey()+" "+ entry.getValue() );
+		}
 		
+		System.out.println("/nSintactic Analysor for ML Grammar:/n");
+		String sequenceForMlGrammar = "var nr1, nr2, result : integer;\r\n" + 
+				"begin\r\n" + 
+				"write('Introduceti cele 2 numere');\r\n" + 
+				"readln(nr1,nr2);\r\n" + 
+				"result:=nr1+nr2;\r\n" + 
+				"writeln;\r\n" + 
+				"write('suma numerelor este:');\r\n" + 
+				"write(result);\r\n" + 
+				"end.";
 		
+		String picaso = ctrl.analSintLL1ForMLGrammar(tableMLGrammar, numberedProductionML, sequenceForMlGrammar);
 	}
 
 }

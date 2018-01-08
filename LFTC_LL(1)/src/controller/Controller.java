@@ -10,6 +10,7 @@ import com.google.common.collect.ArrayTable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
+import com.google.common.collect.Table.Cell;
 
 import model.CellValue;
 import model.Grammar;
@@ -151,6 +152,9 @@ public class Controller {
 						
 						
 					}
+					else if(productionList.get(i).getPdp().get(0).equals("eps")){
+						helpList.add("eps"); // stands for epsilon
+					}
 					}
 				}
 					
@@ -164,6 +168,7 @@ public class Controller {
 		List<Production> productionList = grammar.getProductii();
 		List<String> terminalList = grammar.getTerminali();
 		int indexOfNonterminal = 0;
+		boolean isCalled = false;
 		if(nonterminal.equals(grammar.getSimbolStart())) {
 			helpListForFollow.add("$");
 		}
@@ -174,7 +179,8 @@ public class Controller {
 					for(int j=0; j<splits.length; j++) {
 						if(splits[j].equals(nonterminal)) {
 							indexOfNonterminal = j;
-							if(indexOfNonterminal+1 == splits.length && !productionList.get(i).getPsp().equals(nonterminal)) {
+							if(indexOfNonterminal+1 == splits.length && !productionList.get(i).getPsp().equals(nonterminal) && isCalled == false) {
+								isCalled = true;
 								helpListForFollow = followForMLGrammar(productionList.get(i).getPsp(),grammar).get(productionList.get(i).getPsp());
 							}
 							else if(indexOfNonterminal+1 < splits.length && terminalList.contains(splits[indexOfNonterminal+1]) && !helpListForFollow.contains(splits[indexOfNonterminal + 1])) {
@@ -246,7 +252,7 @@ public class Controller {
 						table.put(production.getPsp(),atom, value);
 					}
 					else if(table.get(production.getPsp(), atom) != null && atom.equals(String.valueOf(production.getPdp().get(0).charAt(0))) ){
-						System.out.println("The Grammar is not of type LL(1)!");
+						System.out.println("Conflict at row "+ production.getPsp()+ " and column "+ atom);
 						System.exit(0);
 					}
 					
@@ -260,7 +266,7 @@ public class Controller {
 							table.put(production.getPsp(),follow, value);
 						}
 						else {
-							System.out.println("The grammar is not of type LL(1).");
+							System.out.println("Conflict at row "+ production.getPsp()+ " and column "+follow);
 							System.exit(0);
 							
 						}
@@ -268,6 +274,97 @@ public class Controller {
 					}
 					
 				}
+			
+				
+			}
+			
+			
+		}
+		for(String row: rowTable) {
+			for(String column: columnTable) {
+				if(row.equals(column)) {
+					if(!row.equals("$")) {
+						CellValue value = new CellValue("pop",0); 
+						table.put(row, column,value);
+					}
+					else {
+						CellValue val = new CellValue("acc",0);
+						table.put(row, column,val);
+					}
+					
+				}
+				else if(!row.equals(column) && table.get(row, column)== null) {
+					CellValue val = new CellValue("err",0);
+					table.put(row, column, val);
+				}
+					
+			}
+		}
+		
+		
+		return table;
+		
+		
+	}
+	
+	public Table<String,String,CellValue> createTableForMLGrammar(Grammar grammar) {
+		List<String> nonterminalList = grammar.getNeterminali();
+		List<String> terminalList = grammar.getTerminali();
+	
+		List<String> columnTable = new ArrayList<String>();
+		for(String terminal: terminalList) {
+			columnTable.add(terminal);
+		}
+		columnTable.add("$");
+		
+		List<String> rowTable = new ArrayList<String>();
+		for(String nonterminal: nonterminalList) {
+			rowTable.add(nonterminal);
+		}
+		for(String terminal: columnTable) {
+			rowTable.add(terminal);
+		}
+		Table<String,String,CellValue> table = ArrayTable.create(rowTable,columnTable);
+		
+		Map<String,Integer> valueMap = new LinkedHashMap<String,Integer>();
+		Map<Production,Integer> mapRuleNumber = numberRuleAppliedToProduction(grammar);
+		List<Production> productionList = grammar.getProductii();
+		for(Production  production: productionList) {
+			helpList.clear();
+			helpListForFollow.clear();
+			List<String> firstList = firstForMLGrammar(production.getPsp(),grammar).get(production.getPsp());
+			String[] splits = production.getPdp().get(0).split(" ");
+			for(String atom:firstList) {
+				if(!atom.equals("eps") && !splits[0].equals("eps")  ) {
+					CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
+						if( table.get(production.getPsp(),atom) == null && (atom.equals(splits[0]) || nonterminalList.contains(splits[0]))) {
+							table.put(production.getPsp(),atom, value);
+						}
+						else if(table.get(production.getPsp(), atom) != null && atom.equals(splits[0])){
+							//System.out.println("The Grammar is not of type LL(1)!");
+							System.out.println("Conflict at row "+ production.getPsp() + " and column "+ atom);
+							System.exit(0);
+						}
+				}
+				else if(atom.equals("eps") && splits[0].equals("eps")) {
+					List<String> followList = followForMLGrammar(production.getPsp(),grammar).get(production.getPsp());
+					for(String follow:followList) {
+						CellValue value = new CellValue(production.getPdp().get(0),mapRuleNumber.get(production));
+						if(table.get(production.getPsp(),follow) == null) {
+							table.put(production.getPsp(),follow, value);
+						}
+						else {
+							//System.out.println("The grammar is not of type LL(1).");
+							System.out.println("Conflict at row "+ production.getPsp()+ " and column "+ follow);
+							System.exit(0);
+							
+						}
+						
+					}
+					
+				}
+						
+					
 			
 				
 			}
@@ -350,7 +447,60 @@ public class Controller {
 			
 		}
 		return pi;
+		}
+	public String analSintLL1ForMLGrammar(Table<String,String,CellValue> table, Map<Production,Integer> ruleNumbers, String sequence) throws IOException {
+		Grammar grammar = this.getRepo().readMlGrammar();
+		String alpha = sequence + "$"; //column
+		String beta = "S$";   //row
+		String pi = "0";
+		boolean go = true;
+		String flag = " ";
+		while(go) {
+			CellValue value = table.get(String.valueOf(beta.charAt(0)), String.valueOf(alpha.charAt(0)));
+			if(value.getPdp() !="err" && value.getPdp()!="acc" && value.getPdp()!="pop") {
+				beta = removeCharAt(beta,0);
+				StringBuilder sBuilder = new StringBuilder(beta);
+				if(!value.getPdp().equals("eps"))
+					beta=String.valueOf(sBuilder.insert(0,value.getPdp()));
+				pi = pi + String.valueOf(value.getRuleNumber());
+				
+			}
+			else {
+				if(value.getPdp() == "pop") {
+					beta = removeCharAt(beta,0);
+					alpha = removeCharAt(alpha,0);
+				}
+				else {
+					if(value.getPdp() == "acc") {
+						go = false;
+						flag = "acc";
+					}
+					else {
+						go = false;
+						flag = "err";
+					}
+				}
+			}
+		}
+		if( flag == "acc") {
+			System.out.println("Sequence " + sequence +" accepted!");
+			System.out.println(pi);
+			System.out.println("\nParsing Tree:\n");
+			String startSymbol = grammar.getSimbolStart();
+			List<String> parsingListTree = parsingTree(pi, ruleNumbers,startSymbol);
+			for(String parse:parsingListTree) {
+				System.out.println(parse);
+			}
+		}
+		else {
+			System.out.println("Sequence "+sequence+ " not accepted!");
+			
+		}
+		return pi;
 	}
+	
+	
+	
 	
 	public static String removeCharAt(String s, int pos) {
 
